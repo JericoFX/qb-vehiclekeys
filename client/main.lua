@@ -15,6 +15,11 @@ local IsHotwiring = false
 -----------------------
 ----   Threads     ----
 -----------------------
+---CHANGE THIS TO A LOW LEVEL GAME EVENT, SIMPLIFY THE STATES
+
+-- Two states:
+-- Has key or not, if not have the key run the command to hotwire, else just give the key to 
+
 
 CreateThread(function()
     while true do
@@ -23,18 +28,17 @@ CreateThread(function()
             sleep = 100
 
             local ped = PlayerPedId()
-            local entering = GetVehiclePedIsTryingToEnter(ped)
-            local carIsImmune = false
-            if entering ~= 0 and not isBlacklistedVehicle(entering) then
-                sleep = 2000
+          --  local entering = GetVehiclePedIsTryingToEnter(ped)
+            local carIsImmune = Config.ImmuneVehicles[`entering`] and true or false 
+            if not isBlacklistedVehicle(entering) then
                 local plate = QBCore.Functions.GetPlate(entering)
-
-                local driver = GetPedInVehicleSeat(entering, -1)
-                for _, veh in ipairs(Config.ImmuneVehicles) do
-                    if GetEntityModel(entering) == joaat(veh) then
-                        carIsImmune = true
-                    end
-                end
+                local driver = GetPedInVehicleSeat(entering, -1) 
+					
+               -- for _, veh in ipairs(Config.ImmuneVehicles) do -- Add hash to the check so will be `hash` as key on the table
+                 --   if GetEntityModel(entering) == joaat(veh) then
+                   --     carIsImmune = true
+                    --end
+               -- end
                 -- Driven vehicle logic
                 if driver ~= 0 and not IsPedAPlayer(driver) and not HasKeys(plate) and not carIsImmune then
                     if IsEntityDead(driver) then
