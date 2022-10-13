@@ -22,16 +22,20 @@ local IsHotwiring = false
 -- Using a combination of CEventNetworkPlayerEnteredVehicle << this one is ONLY when the player is IN the vehicle so doesnt work to check if there is a ped or not, and CEventPlayerUnableToEnterVehicle
 -- CEventPedJackingMyVehicle << when you try to enter a vehicle with a ped on it ¿LockNPCDrivingCars must be false?
 -- CEventPlayerUnableToEnterVehicle -- when the vehicle is locked
+local function disableState()
+lib.disable
+end
+
 
 local eventos = {
-    CEventNetworkPlayerEnteredVehicle = { args = "Jugador %s, Vehiculo %s", fun = function(args)
+    CEventNetworkPlayerEnteredVehicle = function(args)
         local vehicle = args[2]
         local plate = QBCore.Functions.GetPlate(vehicle)
         if HasKeys(plate) then
             SetVehicleEngineOn(vehicle, true, true, true)
         end
-    end },
-    CEventPlayerUnableToEnterVehicle = { fun = function(args)
+    end ,
+    CEventPlayerUnableToEnterVehicle =  function(args)
         local vehicle = GetVehiclePedIsTryingToEnter(PlayerPedId())
         local options = {
             {
@@ -45,8 +49,7 @@ local eventos = {
             }
         }
         exports.ox_target:addLocalEntity(vehicle, options)
-
-    end },
+    end,
     CEventPedJackingMyVehicle = true
 }
 
@@ -4873,6 +4876,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
 end)
 
 RegisterNetEvent('qb-vehiclekeys:client:AddKeys', function(plate)
+    
     KeysList[plate] = true
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) then
